@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $users = User::paginate();
+        $users = User::where('role', '!=', 'Super Admin')->paginate(10);
 
         return view('user.index', compact('users'))
             ->with('i', ($request->input('page', 1) - 1) * $users->perPage());
@@ -42,12 +42,14 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',  // Validación de la contraseña
+            'role' => 'required|in:Psicologo,Paciente',
         ]);
     
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);  // Encriptación de la contraseña
+        $user->role = $request->role;
         $user->save();
     
         return redirect()->route('users.index')->with('success', 'User created successfully');
@@ -56,11 +58,21 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id): View
+    public function show($id)
     {
         $user = User::find($id);
 
-        return view('user.show', compact('user'));
+        // Si no se encuentra el usuario, devuelve un error
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+    
+        // Devuelve los datos del usuario en formato JSON
+        return response()->json([
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]);
     }
 
     /**
@@ -76,19 +88,37 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, User $user): RedirectResponse
-    {
-        $user->update($request->validated());
+    
 
-        return Redirect::route('users.index')
-            ->with('success', 'User updated successfully');
+    public function update(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'role' => 'required|string|in:Psicologo,Paciente',
+    ]);
+
+    $user = User::findOrFail($id);
+    $user->name = $request->input('name');
+    $user->email = $request->input('email');
+    $user->role = $request->input('role'); // Asegúrate de que la columna "role" exista en tu tabla de usuarios.
+    
+    // Si deseas actualizar la contraseña (opcional)
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->input('password'));
     }
+
+    $user->save();
+
+    return redirect()->back()->with('success', 'Usuario actualizado correctamente.');
+}
+
 
     public function destroy($id): RedirectResponse
     {
         User::find($id)->delete();
 
         return Redirect::route('users.index')
-            ->with('success', 'User deleted successfully');
+            ->with('error', 'User deleted successfully');
     }
 }

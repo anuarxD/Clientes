@@ -29,25 +29,30 @@
                 <div class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></div>
             @enderror
         </div>
+        <div class="form-group mb-2">
+            <label for="role" class="form-label">{{ __('Role') }}</label>
+            <select name="role" id="role" class="form-control @error('role') is-invalid @enderror">
+                <option value="">Seleccione un rol</option>
+                <option value='Psicologo' {{ old('role', $user->role ?? '') == 'Psicólogo' ? 'selected' : '' }}>Psicólogo</option>
+                <option value="Paciente" {{ old('role', $user->role ?? '') == 'Paciente' ? 'selected' : '' }}>Paciente</option>
+            </select>
+            @error('role')
+                <div class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></div>
+            @enderror
+        </div>
     </div>
 
 <!-- Mostrar campo de contraseña solo cuando se crea un nuevo usuario -->
-@if (auth()->user()->name === 'Administrador')
+@if (auth()->user()->role === 'Administrador')
             <div class="form-group mb-2 mb20">
                 <label for="password" class="form-label">{{ __('Password') }}</label>
                 <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="password" placeholder="Password">
                 {!! $errors->first('password', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
             </div>
-
             <div class="form-group mb-2 mb20">
                 <label for="password_confirmation" class="form-label">{{ __('Confirm Password') }}</label>
                 <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" placeholder="Confirm Password">
                 {!! $errors->first('password_confirmation', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
             </div>
         @endif
-
-    
-    <div class="col-md-12 mt-2">
-        <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
-    </div>
 </div>
