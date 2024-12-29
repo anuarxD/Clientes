@@ -34,6 +34,12 @@ class User extends Authenticatable
      */
     protected $fillable = ['name', 'email', 'password', 'role'];
 
+    // Relación con Paciente
+    public function patient()
+    {
+        return $this->hasOne(Patient::class, 'usuario_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
