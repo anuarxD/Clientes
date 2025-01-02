@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Patient;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -62,11 +63,23 @@ class RegisterController extends Controller
      * @return \App\Models\User
      */
     protected function create(array $data)
-    {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+{
+    // Crear el usuario
+    $user = User::create([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'password' => Hash::make($data['password']),
+        'role' => 'Paciente',  // Por defecto, el rol es Paciente cuando se registra un nuevo usuario.
+    ]);
+
+    // Si el rol del usuario es 'Paciente', crear un registro en la tabla patients
+    if ($user->role === 'Paciente') {
+        Patient::create([
+            'usuario_id' => $user->id,
         ]);
     }
+
+    return $user;  // Devolver el usuario creado
+}
+
 }

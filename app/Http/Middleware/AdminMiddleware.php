@@ -11,7 +11,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next)
     {
         // Verificar si el usuario está autenticado y tiene el rol de Administrador
-        if (Auth::check() && (Auth::user()->role === 'Administrador' || Auth::user()->role === 'Super Admin')) {
+        if (Auth::check() && (Auth::user()->role === 'Administrador' || Auth::user()->role === 'Super Admin' || Auth::user()->role === 'Super Admin')) {
             return $next($request);
         }
 

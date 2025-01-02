@@ -36,13 +36,30 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
-                    @if(auth()->check() && (auth()->user()->role === 'Administrador' OR auth()->user()->role === 'Super Admin'))
                     <ul class="navbar-nav me-auto">
+                    @if (Auth::check() && (Auth::user()->status === 'activo')) 
+                    @if(auth()->check() && (auth()->user()->role === 'Administrador' OR auth()->user()->role === 'Super Admin'))
+                    
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('users.index') }}">{{ __('Usuarios') }}</a>
                         </li>
-                    </ul>
+                    
                     @endif
+                    @if (auth()->check() && auth()->user()->role !== 'Paciente')
+                    
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('patients.index') }}">{{ __('Pacientes') }}</a>
+                        </li>
+                    @endif
+                    @if (auth()->check() )
+                    
+                    <li class="nav-item">
+                            <a class="nav-link" href="">{{ __('Citas') }}</a>
+                        </li>
+                        @endif
+                    
+                    @endif
+                    </ul>
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
@@ -54,11 +71,11 @@
                         </li>
                         @endif
 
-                        @if(auth()->check() && auth()->user()->role === 'Administrador')
+                        
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                         </li>
-                        @endif
+                        
                         @else
                         <li class="nav-item dropdown">
                             

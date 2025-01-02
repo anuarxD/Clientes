@@ -39,8 +39,8 @@ Users
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th> Role</th>
-
-                                    <th></th>
+                                    <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,6 +51,15 @@ Users
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->role }}</td>
+                                    <td>
+                                        <form action="{{ route('users.toggleStatus', $user->id) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-sm {{ $user->status == 'activo' ? 'btn-success' : 'btn-danger' }}">
+                                                {{ $user->status == 'activo' ? 'Activo' : 'Inactivo' }}
+                                            </button>
+                                        </form>
+                                    </td>
 
                                     <td>
                                         <form action="{{ route('users.destroy', $user->id) }}" method="POST">
@@ -77,55 +86,54 @@ Users
 
 
 <script>
-document.getElementById('createUserForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Cerrar el modal
-            bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
-            // Refrescar la página o actualizar la tabla
-            window.location.reload();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
+    document.getElementById('createUserForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cerrar el modal
+                    bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
+                    // Refrescar la página o actualizar la tabla
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     });
-});
 </script>
 
 
 
 <script>
-function showUser(id) {
-    fetch(`/users/${id}`)
-        .then(response => {
-            // Asegúrate de que la respuesta sea exitosa (código de estado 200)
-            if (!response.ok) {
-                throw new Error('No se pudo obtener la respuesta del servidor');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Verifica que los datos sean correctos
-            if (data && data.name && data.email) {
-                document.getElementById('showName').textContent = data.name;
-                document.getElementById('showEmail').textContent = data.email;
-                document.getElementById('showRole').textContent = data.role;
-            } else {
-                toastr.error('Datos del usuario no encontrados');
-            }
-        })
-        .catch(error => {
-            toastr.error('Error al cargar los datos del usuario: ' + error.message);
-        });
-}
-
+    function showUser(id) {
+        fetch(`/users/${id}`)
+            .then(response => {
+                // Asegúrate de que la respuesta sea exitosa (código de estado 200)
+                if (!response.ok) {
+                    throw new Error('No se pudo obtener la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Verifica que los datos sean correctos
+                if (data && data.name && data.email) {
+                    document.getElementById('showName').textContent = data.name;
+                    document.getElementById('showEmail').textContent = data.email;
+                    document.getElementById('showRole').textContent = data.role;
+                } else {
+                    toastr.error('Datos del usuario no encontrados');
+                }
+            })
+            .catch(error => {
+                toastr.error('Error al cargar los datos del usuario: ' + error.message);
+            });
+    }
 </script>
 
 <script>

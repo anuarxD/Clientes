@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Patient;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
@@ -51,6 +52,12 @@ class UserController extends Controller
         $user->password = Hash::make($request->password);  // Encriptación de la contraseña
         $user->role = $request->role;
         $user->save();
+
+        if ($user->role === 'Paciente') {
+            Patient::create([
+                'usuario_id' => $user->id,
+            ]);
+        }
     
         return redirect()->route('users.index')->with('success', 'User created successfully');
     }
@@ -114,11 +121,34 @@ class UserController extends Controller
 }
 
 
-    public function destroy($id): RedirectResponse
-    {
-        User::find($id)->delete();
+public function destroy($id): RedirectResponse
+{
+    // Encontrar el usuario por su ID
+    $user = User::find($id);
+
+    // Si el usuario existe, eliminarlo
+    if ($user) {
+        // Eliminar el usuario y su paciente asociado automáticamente gracias a onDelete('cascade')
+        $user->delete();
 
         return Redirect::route('users.index')
-            ->with('error', 'User deleted successfully');
+            ->with('success', 'Usuario y sus datos asociados eliminados correctamente');
     }
+
+    return Redirect::route('users.index')
+        ->with('error', 'Usuario no encontrado');
+}
+
+public function toggleStatus($id)
+{
+    $user = User::findOrFail($id);
+
+    // Cambiar estado: si es 'activo', cambiar a 'inactivo', y viceversa
+    $user->status = $user->status === 'activo' ? 'inactivo' : 'activo';
+    $user->save();
+
+    // Redirigir con un mensaje de éxito
+    return redirect()->route('users.index')->with('success', 'El estado del usuario ha sido actualizado.');
+}
+
 }

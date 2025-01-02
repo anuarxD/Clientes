@@ -43,7 +43,7 @@
     </div>
 
 <!-- Mostrar campo de contraseña solo cuando se crea un nuevo usuario -->
-@if (auth()->user()->role === 'Administrador')
+@if (auth()->user()->role === 'Administrador' OR auth()->user()->role === 'Super Admin')
             <div class="form-group mb-2 mb20">
                 <label for="password" class="form-label">{{ __('Password') }}</label>
                 <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="password" placeholder="Password">

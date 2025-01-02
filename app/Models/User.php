@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+use App\Models\Patient;
 /**
  * Class User
  *
@@ -37,7 +37,7 @@ class User extends Authenticatable
     // Relación con Paciente
     public function patient()
     {
-        return $this->hasOne(Patient::class, 'usuario_id');
+        return $this->hasOne(Patient::class, 'usuario_id')->onDelete('cascade');;
     }
 
     /**
